@@ -27,13 +27,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: `${decodedCategory} 카테고리`,
-    description: `${decodedCategory} 관련 테니스 뇌피셜 모음 - 물리원리와 인체구조 기반 테니스 분석을 확인하세요.`,
+    description: `${decodedCategory} 관련 테크매니아 콘텐츠 모음 - 최신 테크 제품 리뷰와 분석을 확인하세요.`,
     openGraph: {
-      title: `${decodedCategory} - 테니스 뇌피셜`,
-      description: `${decodedCategory} 관련 테니스 뇌피셜 모음`,
+      title: `${decodedCategory} - 테크매니아`,
+      description: `${decodedCategory} 관련 테크매니아 콘텐츠 모음`,
       type: 'website',
       url: categoryUrl,
-      siteName: '테니스 뇌피셜',
+      siteName: '테크매니아',
       locale: 'ko_KR',
     },
     alternates: {

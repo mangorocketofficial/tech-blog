@@ -2,8 +2,8 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: '문의하기 - 테니스 뇌피셜',
-  description: '테니스 뇌피셜에 문의사항이 있으시면 연락해 주세요.',
+  title: '문의하기 - 테크매니아',
+  description: '테크매니아에 문의사항이 있으시면 연락해 주세요.',
 }
 
 export default function ContactPage() {
@@ -25,7 +25,7 @@ export default function ContactPage() {
 
           <div className="prose prose-lg max-w-none text-gray-700">
             <p className="text-lg mb-8">
-              테니스 뇌피셜에 관심을 가져주셔서 감사합니다.
+              테크매니아에 관심을 가져주셔서 감사합니다.
               문의사항, 제안, 피드백이 있으시면 아래 방법으로 연락해 주세요.
             </p>
 
@@ -146,7 +146,7 @@ export default function ContactPage() {
             </Link>
           </nav>
           <p className="text-center text-gray-400 text-xs">
-            © {new Date().getFullYear()} 테니스 뇌피셜. All rights reserved.
+            © {new Date().getFullYear()} 테크매니아. All rights reserved.
           </p>
         </div>
       </footer>

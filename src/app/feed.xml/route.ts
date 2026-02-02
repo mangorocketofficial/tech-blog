@@ -27,15 +27,15 @@ export async function GET() {
   xmlns:content="http://purl.org/rss/1.0/modules/content/"
   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <channel>
-    <title>테니스 뇌피셜</title>
+    <title>테크매니아</title>
     <link>${siteUrl}</link>
-    <description>테니스를 물리원리와 인체구조로 설명합니다.</description>
+    <description>최신 테크 제품 리뷰와 트렌드를 분석합니다.</description>
     <language>ko-KR</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
     <atom:link href="${siteUrl}/feed.xml" rel="self" type="application/rss+xml"/>
     <image>
       <url>${siteUrl}/logo.png</url>
-      <title>테니스 뇌피셜</title>
+      <title>테크매니아</title>
       <link>${siteUrl}</link>
     </image>
     ${rssItems}

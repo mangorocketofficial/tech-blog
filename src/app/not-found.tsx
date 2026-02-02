@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 export const metadata: Metadata = {
   title: '페이지를 찾을 수 없습니다',
-  description: '요청하신 페이지를 찾을 수 없습니다. 홈페이지로 이동하여 다른 테니스 뇌피셜를 확인하세요.',
+  description: '요청하신 페이지를 찾을 수 없습니다. 홈페이지로 이동하여 다른 콘텐츠를 확인하세요.',
   robots: {
     index: false,
     follow: true,

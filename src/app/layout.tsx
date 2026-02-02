@@ -19,21 +19,21 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://golf-blog.vercel.ap
 
 export const metadata: Metadata = {
   title: {
-    default: "테니스 뇌피셜 | 물리원리와 인체구조로 배우는 테니스",
-    template: "%s | 테니스 뇌피셜",
+    default: "테크매니아 | 최신 테크 트렌드와 리뷰",
+    template: "%s | 테크매니아",
   },
   description:
-    "테니스를 물리원리와 인체구조로 설명합니다. 스윙 메커니즘, 스핀의 과학, 운동역학적 분석을 통해 테니스 실력 향상에 도움을 드립니다.",
-  keywords: ["테니스", "테니스 스윙", "테니스 물리", "테니스 기술", "테니스 분석"],
-  authors: [{ name: "테니스 뇌피셜" }],
+    "최신 테크 제품 리뷰와 트렌드를 분석합니다. AI 도구, 휴대폰, 노트북, 가전제품 등 다양한 테크 정보를 제공합니다.",
+  keywords: ["테크", "리뷰", "AI", "휴대폰", "노트북", "가전제품", "테크 트렌드"],
+  authors: [{ name: "테크매니아" }],
   openGraph: {
     type: "website",
     locale: "ko_KR",
     url: siteUrl,
-    siteName: "테니스 뇌피셜",
-    title: "테니스 뇌피셜 | 물리원리와 인체구조로 배우는 테니스",
+    siteName: "테크매니아",
+    title: "테크매니아 | 최신 테크 트렌드와 리뷰",
     description:
-      "테니스를 물리원리와 인체구조로 설명합니다.",
+      "최신 테크 제품 리뷰와 트렌드를 분석합니다.",
   },
   robots: {
     index: true,
@@ -68,10 +68,10 @@ export const metadata: Metadata = {
 const websiteJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  name: "테니스 뇌피셜",
-  alternateName: "Tennis Brain Theory",
+  name: "테크매니아",
+  alternateName: "Tech Mania",
   url: siteUrl,
-  description: "테니스를 물리원리와 인체구조로 설명합니다.",
+  description: "최신 테크 제품 리뷰와 트렌드를 분석합니다.",
   inLanguage: "ko-KR",
   potentialAction: {
     "@type": "SearchAction",
@@ -87,11 +87,11 @@ const websiteJsonLd = {
 const organizationJsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "테니스 뇌피셜",
-  alternateName: "Tennis Brain Theory",
+  name: "테크매니아",
+  alternateName: "Tech Mania",
   url: siteUrl,
   logo: `${siteUrl}/logo.png`,
-  description: "테니스를 물리원리와 인체구조로 설명하는 블로그",
+  description: "최신 테크 제품 리뷰와 트렌드를 분석하는 블로그",
   sameAs: [],
   contactPoint: {
     "@type": "ContactPoint",

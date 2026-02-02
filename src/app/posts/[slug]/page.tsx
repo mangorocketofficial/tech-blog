@@ -101,12 +101,12 @@ export default async function PostPage({ params }: PageProps) {
     },
     author: {
       '@type': 'Organization',
-      name: '테니스 뇌피셜',
+      name: '테크매니아',
       url: siteUrl,
     },
     publisher: {
       '@type': 'Organization',
-      name: '테니스 뇌피셜',
+      name: '테크매니아',
       url: siteUrl,
       logo: {
         '@type': 'ImageObject',
@@ -154,7 +154,7 @@ export default async function PostPage({ params }: PageProps) {
       },
       author: {
         '@type': 'Organization',
-        name: '테니스 뇌피셜',
+        name: '테크매니아',
       },
       reviewBody: post.description,
       datePublished: post.published_at,
@@ -268,7 +268,7 @@ export default async function PostPage({ params }: PageProps) {
             <div className="relative h-64 md:h-96 mb-8 rounded-lg overflow-hidden">
               <Image
                 src={post.featured_image}
-                alt={`${post.product_name || post.title} - ${post.category} 제품 이미지, 테니스 뇌피셜`}
+                alt={`${post.product_name || post.title} - ${post.category} 제품 이미지, 테크매니아`}
                 fill
                 className="object-cover"
                 priority
@@ -404,7 +404,7 @@ export default async function PostPage({ params }: PageProps) {
               </Link>
             </nav>
             <p className="text-center text-gray-400 text-xs">
-              © {new Date().getFullYear()} 테니스 뇌피셜. All rights reserved.
+              © {new Date().getFullYear()} 테크매니아. All rights reserved.
             </p>
           </div>
         </footer>

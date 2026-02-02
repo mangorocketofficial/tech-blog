@@ -4,7 +4,7 @@ import { getCategories } from '@/lib/supabase-server'
 
 export const metadata: Metadata = {
   title: '카테고리',
-  description: '테니스 뇌피셜 카테고리별 콘텐츠 모음',
+  description: '테크매니아 카테고리별 콘텐츠 모음',
 }
 
 export const revalidate = 3600

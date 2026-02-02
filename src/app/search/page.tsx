@@ -5,7 +5,7 @@ import { searchPosts } from '@/lib/supabase-server'
 
 export const metadata: Metadata = {
   title: '검색 결과',
-  description: '테니스 뇌피셜 검색 - 테니스 기술, 물리원리, 장비 분석 등 다양한 콘텐츠를 검색하세요.',
+  description: '테크매니아 검색 - AI 도구, 휴대폰, 노트북, 가전제품 등 다양한 테크 콘텐츠를 검색하세요.',
   robots: {
     index: false,
     follow: true,

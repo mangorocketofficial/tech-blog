@@ -139,7 +139,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate and prepare post data
-    const title = generatedData.title || `${topic} - 테니스 뇌피셜`
+    const title = generatedData.title || `${topic} - 테크매니아`
 
     // Generate slug in 테크-X format
     const nextSlugNumber = await getNextSlugNumber(supabase)

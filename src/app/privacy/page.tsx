@@ -2,8 +2,8 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: '개인정보처리방침 - 테니스 뇌피셜',
-  description: '테니스 뇌피셜 사이트의 개인정보처리방침입니다.',
+  title: '개인정보처리방침 - 테크매니아',
+  description: '테크매니아 사이트의 개인정보처리방침입니다.',
 }
 
 export default function PrivacyPage() {
@@ -29,7 +29,7 @@ export default function PrivacyPage() {
             <section>
               <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-4">1. 개인정보의 수집 및 이용 목적</h2>
               <p>
-                테니스 뇌피셜(이하 &quot;본 사이트&quot;)는 다음의 목적을 위하여 개인정보를 처리합니다.
+                테크매니아(이하 &quot;본 사이트&quot;)는 다음의 목적을 위하여 개인정보를 처리합니다.
                 처리하고 있는 개인정보는 다음의 목적 이외의 용도로는 이용되지 않으며,
                 이용 목적이 변경되는 경우에는 별도의 동의를 받는 등 필요한 조치를 이행할 예정입니다.
               </p>
@@ -137,7 +137,7 @@ export default function PrivacyPage() {
             </Link>
           </nav>
           <p className="text-center text-gray-400 text-xs">
-            © {new Date().getFullYear()} 테니스 뇌피셜. All rights reserved.
+            © {new Date().getFullYear()} 테크매니아. All rights reserved.
           </p>
         </div>
       </footer>
