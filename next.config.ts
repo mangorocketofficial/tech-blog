@@ -19,6 +19,14 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'image*.coupangcdn.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'img.danawa.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.samsung.com',
+      },
     ],
     formats: ['image/avif', 'image/webp'],
   },
