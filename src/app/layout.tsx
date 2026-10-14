@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Noto_Sans_KR } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { SITE_HOSTNAME, SITE_URL } from "@/lib/site";
@@ -9,12 +8,6 @@ const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
 // Google Search Console Verification
 const GOOGLE_SITE_VERIFICATION = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
-
-const notoSansKr = Noto_Sans_KR({
-  variable: "--font-noto-sans-kr",
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-});
 
 const siteUrl = SITE_URL;
 
@@ -140,7 +133,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
         />
       </head>
-      <body className={`${notoSansKr.variable} font-sans antialiased`}>
+      <body className="font-sans antialiased">
         {children}
       </body>
     </html>
