@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: '테크매니아 카테고리별 콘텐츠 모음',
 }
 
-export const revalidate = 3600
+export const revalidate = 21600
 
 export default async function CategoriesPage() {
   const categories = await getCategories()
@@ -53,6 +53,7 @@ export default async function CategoriesPage() {
               <Link
                 key={category.name}
                 href={`/category/${encodeURIComponent(category.name)}`}
+                prefetch={false}
                 className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow group"
               >
                 <div className="flex items-center gap-4">

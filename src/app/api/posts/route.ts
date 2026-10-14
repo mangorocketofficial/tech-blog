@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { revalidateTag } from 'next/cache'
 import type { FaqItem } from '@/types/database'
 
 // Force dynamic rendering
@@ -140,6 +141,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
+    revalidateTag('posts', 'max')
     return NextResponse.json({ post: data }, { status: 201 })
   } catch (err) {
     console.error('API error:', err)
@@ -219,6 +221,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
+    revalidateTag('posts', 'max')
     return NextResponse.json({ post: data })
   } catch (err) {
     console.error('API error:', err)
@@ -256,6 +259,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
+    revalidateTag('posts', 'max')
     return NextResponse.json({ success: true })
   } catch (err) {
     console.error('API error:', err)

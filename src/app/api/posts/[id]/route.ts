@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { revalidateTag } from 'next/cache'
 
 export const dynamic = 'force-dynamic'
 
@@ -47,6 +48,7 @@ export async function GET(
       return NextResponse.json({ error: error.message }, { status: 404 })
     }
 
+    revalidateTag('posts', 'max')
     return NextResponse.json({ post: data })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Server error'

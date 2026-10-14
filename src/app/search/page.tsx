@@ -77,7 +77,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                   key={post.id}
                   className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
                 >
-                  <Link href={`/posts/${post.slug}`}>
+                  <Link href={`/posts/${post.slug}`} prefetch={false}>
                     <div className="relative h-48 bg-gray-200">
                       {post.featured_image ? (
                         <Image

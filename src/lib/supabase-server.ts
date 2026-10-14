@@ -1,4 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
+import { unstable_cache } from 'next/cache'
+import { cache } from 'react'
 import type { Database, Post } from '@/types/database'
 
 // Post list type for listing pages
@@ -13,7 +15,7 @@ export function createServerSupabaseClient() {
 }
 
 // Fetch published posts
-export async function getPublishedPosts(limit?: number): Promise<PostListItem[]> {
+async function fetchPublishedPosts(limit?: number): Promise<PostListItem[]> {
   const supabase = createServerSupabaseClient()
 
   let query = supabase
@@ -37,7 +39,7 @@ export async function getPublishedPosts(limit?: number): Promise<PostListItem[]>
 }
 
 // Fetch single post by slug
-export async function getPostBySlug(slug: string): Promise<Post | null> {
+async function fetchPostBySlug(slug: string): Promise<Post | null> {
   const supabase = createServerSupabaseClient()
 
   const { data, error } = await supabase
@@ -56,7 +58,7 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
 }
 
 // Fetch posts by category
-export async function getPostsByCategory(category: string, limit?: number): Promise<PostListItem[]> {
+async function fetchPostsByCategory(category: string, limit?: number): Promise<PostListItem[]> {
   const supabase = createServerSupabaseClient()
 
   let query = supabase
@@ -81,7 +83,7 @@ export async function getPostsByCategory(category: string, limit?: number): Prom
 }
 
 // Get all categories with post count
-export async function getCategories(): Promise<{ name: string; count: number }[]> {
+async function fetchCategories(): Promise<{ name: string; count: number }[]> {
   const supabase = createServerSupabaseClient()
 
   const { data, error } = await supabase
@@ -109,7 +111,7 @@ export async function getCategories(): Promise<{ name: string; count: number }[]
 }
 
 // Get all post slugs (for sitemap)
-export async function getAllPostSlugs(): Promise<{ slug: string; updated_at: string }[]> {
+async function fetchAllPostSlugs(): Promise<{ slug: string; updated_at: string }[]> {
   const supabase = createServerSupabaseClient()
 
   const { data, error } = await supabase
@@ -129,7 +131,7 @@ export async function getAllPostSlugs(): Promise<{ slug: string; updated_at: str
 type RelatedPostItem = Pick<Post, 'id' | 'slug' | 'title' | 'featured_image' | 'category'>
 
 // Get related posts (same category, excluding current post)
-export async function getRelatedPosts(
+async function fetchRelatedPosts(
   currentSlug: string,
   category: string,
   limit: number = 3
@@ -154,7 +156,7 @@ export async function getRelatedPosts(
 }
 
 // Search posts by keyword
-export async function searchPosts(query: string, limit: number = 20): Promise<PostListItem[]> {
+async function fetchSearchPosts(query: string, limit: number = 20): Promise<PostListItem[]> {
   const supabase = createServerSupabaseClient()
 
   // Search in title, description, and content using ilike
@@ -175,7 +177,7 @@ export async function searchPosts(query: string, limit: number = 20): Promise<Po
 }
 
 // Get paginated posts
-export async function getPaginatedPosts(
+async function fetchPaginatedPosts(
   page: number = 1,
   pageSize: number = 9
 ): Promise<{ posts: PostListItem[]; totalCount: number; totalPages: number }> {
@@ -217,7 +219,7 @@ export async function getPaginatedPosts(
 }
 
 // Get popular posts (by view count)
-export async function getPopularPosts(limit: number = 5): Promise<PostListItem[]> {
+async function fetchPopularPosts(limit: number = 5): Promise<PostListItem[]> {
   const supabase = createServerSupabaseClient()
 
   const { data, error } = await supabase
@@ -236,7 +238,7 @@ export async function getPopularPosts(limit: number = 5): Promise<PostListItem[]
 }
 
 // Get all unique tags with count
-export async function getAllTags(): Promise<{ name: string; count: number }[]> {
+async function fetchAllTags(): Promise<{ name: string; count: number }[]> {
   const supabase = createServerSupabaseClient()
 
   const { data, error } = await supabase
@@ -264,6 +266,60 @@ export async function getAllTags(): Promise<{ name: string; count: number }[]> {
     .map(([name, count]) => ({ name, count }))
     .sort((a, b) => b.count - a.count)
 }
+
+const POSTS_CACHE_TAG = 'posts'
+const CONTENT_CACHE_SECONDS = 21600
+
+export const getPublishedPosts = unstable_cache(fetchPublishedPosts, ['published-posts'], {
+  revalidate: CONTENT_CACHE_SECONDS,
+  tags: [POSTS_CACHE_TAG],
+})
+
+const getPostBySlugFromCache = unstable_cache(fetchPostBySlug, ['post-by-slug'], {
+  revalidate: CONTENT_CACHE_SECONDS,
+  tags: [POSTS_CACHE_TAG],
+})
+export const getPostBySlug = cache(getPostBySlugFromCache)
+
+export const getPostsByCategory = unstable_cache(fetchPostsByCategory, ['posts-by-category'], {
+  revalidate: CONTENT_CACHE_SECONDS,
+  tags: [POSTS_CACHE_TAG],
+})
+
+export const getCategories = unstable_cache(fetchCategories, ['post-categories'], {
+  revalidate: CONTENT_CACHE_SECONDS,
+  tags: [POSTS_CACHE_TAG],
+})
+
+export const getAllPostSlugs = unstable_cache(fetchAllPostSlugs, ['post-slugs'], {
+  revalidate: CONTENT_CACHE_SECONDS,
+  tags: [POSTS_CACHE_TAG],
+})
+
+export const getRelatedPosts = unstable_cache(fetchRelatedPosts, ['related-posts'], {
+  revalidate: CONTENT_CACHE_SECONDS,
+  tags: [POSTS_CACHE_TAG],
+})
+
+export const searchPosts = unstable_cache(fetchSearchPosts, ['search-posts'], {
+  revalidate: 300,
+  tags: [POSTS_CACHE_TAG],
+})
+
+export const getPaginatedPosts = unstable_cache(fetchPaginatedPosts, ['paginated-posts'], {
+  revalidate: CONTENT_CACHE_SECONDS,
+  tags: [POSTS_CACHE_TAG],
+})
+
+export const getPopularPosts = unstable_cache(fetchPopularPosts, ['popular-posts'], {
+  revalidate: CONTENT_CACHE_SECONDS,
+  tags: [POSTS_CACHE_TAG],
+})
+
+export const getAllTags = unstable_cache(fetchAllTags, ['post-tags'], {
+  revalidate: CONTENT_CACHE_SECONDS,
+  tags: [POSTS_CACHE_TAG],
+})
 
 // Increment view count (optional - requires RPC function in Supabase)
 // export async function incrementViewCount(postId: string) {

@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { getPostsByCategory, getCategories } from '@/lib/supabase-server'
 
-export const revalidate = 3600
+export const revalidate = 21600
 
 interface PageProps {
   params: Promise<{ category: string }>
@@ -80,7 +80,7 @@ export default async function CategoryPage({ params }: PageProps) {
               key={post.id}
               className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
             >
-              <Link href={`/posts/${post.slug}`}>
+              <Link href={`/posts/${post.slug}`} prefetch={false}>
                 <div className="relative h-48 bg-gray-200">
                   {post.featured_image ? (
                     <Image

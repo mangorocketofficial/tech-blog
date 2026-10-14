@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation'
 import { getPostBySlug, getAllPostSlugs, getRelatedPosts } from '@/lib/supabase-server'
 import type { FaqItem } from '@/types/database'
 
-export const revalidate = 3600 // Revalidate every hour
+export const revalidate = 21600 // Revalidate every 6 hours
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -248,7 +248,7 @@ export default async function PostPage({ params }: PageProps) {
                   <Link href="/" className="hover:text-green-600">홈</Link>
                 </li>
                 <li className="before:content-['/'] before:mx-2">
-                  <Link href={`/category/${encodeURIComponent(post.category)}`} className="hover:text-green-600">
+                  <Link href={`/category/${encodeURIComponent(post.category)}`} prefetch={false} className="hover:text-green-600">
                     {post.category}
                   </Link>
                 </li>
@@ -304,6 +304,7 @@ export default async function PostPage({ params }: PageProps) {
                 <Link
                   key={tag}
                   href={`/search?q=${encodeURIComponent(tag)}`}
+                  prefetch={false}
                   className="bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full hover:bg-green-100 hover:text-green-700 transition-colors"
                 >
                   #{tag}
@@ -353,6 +354,7 @@ export default async function PostPage({ params }: PageProps) {
                 <Link
                   key={relatedPost.id}
                   href={`/posts/${relatedPost.slug}`}
+                  prefetch={false}
                   className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow"
                 >
                   <div className="relative h-32 bg-gray-200">
@@ -414,4 +416,3 @@ export default async function PostPage({ params }: PageProps) {
     </>
   )
 }
-

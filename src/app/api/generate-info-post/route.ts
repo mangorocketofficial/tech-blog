@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import OpenAI from 'openai'
+import { revalidateTag } from 'next/cache'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -187,6 +188,7 @@ export async function POST(request: NextRequest) {
     }
 
     console.log(`Info post created successfully: ${data.title}`)
+    revalidateTag('posts', 'max')
 
     return NextResponse.json({
       post: data,
