@@ -1,6 +1,7 @@
 import { notFound, permanentRedirect } from 'next/navigation'
 import BlogHomePage from '@/components/BlogHomePage'
 import { getPaginatedPosts } from '@/lib/supabase-server'
+import type { Metadata } from 'next'
 
 export const revalidate = 21600
 
@@ -14,6 +15,13 @@ export async function generateStaticParams() {
   return Array.from({ length: Math.max(0, totalPages - 1) }, (_, index) => ({
     page: String(index + 2),
   }))
+}
+
+export async function generateMetadata({ params }: PaginatedHomePageProps): Promise<Metadata> {
+  const { page } = await params
+  return {
+    alternates: { canonical: `/page/${page}` },
+  }
 }
 
 export default async function PaginatedHomePage({ params }: PaginatedHomePageProps) {

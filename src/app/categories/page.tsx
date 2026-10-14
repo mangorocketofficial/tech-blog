@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { getCategories } from '@/lib/supabase-server'
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/categories' },
   title: '카테고리',
   description: '테크매니아 카테고리별 콘텐츠 모음',
 }

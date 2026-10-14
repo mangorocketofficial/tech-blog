@@ -1,8 +1,9 @@
 import { MetadataRoute } from 'next'
 import { getAllPostSlugs, getCategories } from '@/lib/supabase-server'
+import { SITE_URL } from '@/lib/site'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://golf-blog.vercel.app'
+  const siteUrl = SITE_URL
 
   // Get all posts
   const posts = await getAllPostSlugs()

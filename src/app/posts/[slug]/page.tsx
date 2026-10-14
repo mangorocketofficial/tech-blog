@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { getPostBySlug, getAllPostSlugs, getRelatedPosts } from '@/lib/supabase-server'
 import type { FaqItem } from '@/types/database'
+import { SITE_URL } from '@/lib/site'
 
 export const revalidate = 21600 // Revalidate every 6 hours
 
@@ -31,7 +32,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     }
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://golf-blog.vercel.app'
+  const siteUrl = SITE_URL
 
   return {
     title: post.title,
@@ -86,7 +87,7 @@ export default async function PostPage({ params }: PageProps) {
     ? new Intl.NumberFormat('ko-KR').format(post.product_price) + '원'
     : null
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://golf-blog.vercel.app'
+  const siteUrl = SITE_URL
 
   // JSON-LD Article Schema
   const articleJsonLd = {

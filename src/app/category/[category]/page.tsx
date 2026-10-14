@@ -3,6 +3,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { getPostsByCategory, getCategories } from '@/lib/supabase-server'
+import { SITE_URL } from '@/lib/site'
 
 export const revalidate = 21600
 
@@ -22,7 +23,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { category } = await params
   const decodedCategory = decodeURIComponent(category)
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://golf-blog.vercel.app'
+  const siteUrl = SITE_URL
   const categoryUrl = `${siteUrl}/category/${encodeURIComponent(decodedCategory)}`
 
   return {

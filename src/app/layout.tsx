@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Noto_Sans_KR } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
+import { SITE_HOSTNAME, SITE_URL } from "@/lib/site";
 
 // Google Analytics Measurement ID
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
@@ -15,9 +16,10 @@ const notoSansKr = Noto_Sans_KR({
   weight: ["400", "500", "700"],
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://golf-blog.vercel.app";
+const siteUrl = SITE_URL;
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
     default: "테크매니아 | 최신 테크 트렌드와 리뷰",
     template: "%s | 테크매니아",
@@ -48,16 +50,8 @@ export const metadata: Metadata = {
   },
   verification: {
     google: "V8mBCjzb1VfloZDHhdghSvJe_m9g2Z3BgyTatpgva8k",
-    other: {
-      "naver-site-verification": "b51349914fb24612e3a5ed8d11501df5ffc47ae3",
-    },
   },
   alternates: {
-    canonical: siteUrl,
-    languages: {
-      "ko-KR": siteUrl,
-      "x-default": siteUrl,
-    },
     types: {
       "application/rss+xml": `${siteUrl}/feed.xml`,
     },
@@ -119,10 +113,12 @@ export default function RootLayout({
               {`
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){dataLayer.push(arguments);}
-                gtag('js', new Date());
-                gtag('config', '${GA_MEASUREMENT_ID}', {
-                  page_path: window.location.pathname,
-                });
+                window.gtag = gtag;
+                // 운영 도메인에서만 수집하고, ga_internal 쿠키가 있으면 내부 트래픽으로 표시
+                if (location.hostname === '${SITE_HOSTNAME}') {
+                  gtag('js', new Date());
+                  gtag('config', '${GA_MEASUREMENT_ID}', document.cookie.indexOf('ga_internal=1') !== -1 ? { traffic_type: 'internal' } : {});
+                }
               `}
             </Script>
           </>

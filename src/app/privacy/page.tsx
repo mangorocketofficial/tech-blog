@@ -2,6 +2,7 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/privacy' },
   title: '개인정보처리방침 - 테크매니아',
   description: '테크매니아 사이트의 개인정보처리방침입니다.',
 }
