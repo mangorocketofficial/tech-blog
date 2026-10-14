@@ -6,7 +6,7 @@
 
 ```text
 일반 방문자
-  -> Cloudflare Pages 정적 HTML/CSS/JS
+  -> Cloudflare Workers Static Assets의 정적 HTML/CSS/JS
   -> 글 조회 시 Supabase 및 서버 함수 호출 없음
 
 관리자 /admin
@@ -20,12 +20,12 @@
   -> Next.js가 모든 페이지를 정적 HTML로 출력
   -> 브라우저 검색용 public/search-index.json 생성
   -> RSC .txt 파일 제거
-  -> Cloudflare Pages에 out/ 한 번 배포
+  -> Cloudflare Workers Static Assets에 out/ 한 번 배포
 ```
 
 사이트 설정:
 
-| 저장소 | 정식 도메인 | Supabase ref | Edge profile | Cloudflare project |
+| 저장소 | 정식 도메인 | Supabase ref | Edge profile | Cloudflare Worker |
 | --- | --- | --- | --- | --- |
 | `tech-blog` | `www.cheetahrockets.com` | `miubturwmhzctjeyiakp` | `tech` | `tech-blog` |
 | `pet_blog` | `www.petbusan.com` | `ibpfwwrqdbpqekoptior` | `pet` | `pet-blog` |
@@ -36,9 +36,9 @@
 1. `/admin`에서 글을 작성·수정·삭제한다. 작업은 Edge Function과 Supabase에서 끝나며 공개 정적 사이트는 아직 바뀌지 않는다.
 2. 필요한 글을 모두 작성한 뒤 `작성한 글 배포`를 한 번 실행한다.
 3. 배포 작업이 전체 공개 글 스냅샷을 새로 만들고 정적 사이트를 교체한다.
-4. 실패한 배포는 기존 Cloudflare 배포에 영향을 주지 않는다. 성공한 배포만 production으로 승격된다.
+4. 실패한 업로드는 기존 Cloudflare 배포에 영향을 주지 않는다. 필요하면 이전 Worker 버전으로 롤백한다.
 
-GitHub Actions에는 수동 실행과 1일 1회 예약 실행이 있다. Edge Function의 배포 버튼을 쓰려면 `DEPLOY_HOOK_URL` 또는 최소 `Actions: write` 권한의 `GITHUB_DEPLOY_TOKEN`을 Edge secret으로 추가해야 한다.
+GitHub Actions에는 수동 실행과 1일 1회 예약 실행이 있다. Edge Function의 배포 버튼을 쓰려면 최소 `Actions: write` 권한의 `GITHUB_DEPLOY_TOKEN`을 Edge secret으로 추가해야 한다.
 
 ## 로컬 명령
 
@@ -67,7 +67,7 @@ npm run deploy:cloudflare
 - canonical, sitemap, robots, RSS, JSON-LD는 각 저장소의 `src/lib/site.ts`에 고정된 기존 `www` URL을 사용한다.
 - 루트 도메인은 Cloudflare Redirect Rule에서 `https://www.<domain>/${1}`로 301 이동한다.
 - GA4 측정 ID와 Google Search Console 검증 메타 태그는 기존 값을 그대로 빌드한다.
-- DNS 전환 전에 Pages 미리보기에서 canonical, GA4 ID, sitemap, 주요 글 URL을 확인한다.
+- DNS 전환 전에 `workers.dev` 주소에서 canonical, GA4 ID, sitemap, 주요 글 URL을 확인한다.
 - 전환 후 같은 URL에 200, 루트 도메인에 301, 기존 글 URL에 200이 나오는지 다시 확인한다.
 
 ## 도메인당 1만 글 기준
@@ -76,11 +76,11 @@ npm run deploy:cloudflare
 
 | 사이트 | 글 수 | 배포 파일 수 | 출력 크기 |
 | --- | ---: | ---: | ---: |
-| tech | 249 | 469 | 약 25MB |
-| pet | 387 | 624 | 약 40MB |
-| golf | 298 | 517 | 약 31MB |
+| tech | 249 | 342 | 약 20MB |
+| pet | 387 | 497 | 약 35MB |
+| golf | 298 | 390 | 약 24MB |
 
-이 비율이면 1만 글은 사이트당 대략 1만~1.1만 파일, 약 0.5~1GB이다. Cloudflare Pages 무료 플랜의 배포당 2만 파일 범위 안이다.
+이 비율이면 1만 글은 사이트당 대략 1만~1.1만 파일, 약 0.5~1GB이다. Cloudflare Workers 무료 플랜의 Static Assets 버전당 2만 파일 범위 안이다. 정적 파일 요청은 무료이며 Worker 스크립트를 실행하지 않는다.
 
 권장 운영 기준:
 
@@ -94,4 +94,4 @@ npm run deploy:cloudflare
 
 ## 롤백
 
-DNS 전환 전에는 Vercel을 유지한다. Cloudflare production 확인 후 DNS만 바꾸며, 문제가 생기면 DNS 레코드를 기존 Vercel 대상으로 되돌릴 수 있다. Cloudflare Pages에서도 이전 성공 배포를 production으로 즉시 되돌릴 수 있다.
+DNS 전환 전에는 Vercel을 유지한다. Cloudflare production 확인 후 DNS만 바꾸며, 문제가 생기면 DNS 레코드를 기존 Vercel 대상으로 되돌릴 수 있다. Cloudflare에서도 이전 성공 Worker 버전으로 즉시 롤백할 수 있다.
