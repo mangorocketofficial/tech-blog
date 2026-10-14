@@ -5,7 +5,7 @@
   "scripts": {
     "content:sync": "node scripts/sync-content.mjs",
     "dev": "npm run content:sync && next dev",
-    "build": "npm run content:sync && next build && node scripts/prune-static-output.mjs",
+    "build": "npm run content:sync && next build && node scripts/prune-static-output.mjs && node scripts/verify-static-output.mjs",
     "start": "next start",
     "lint": "eslint",
     "deploy:cloudflare": "npm run build && wrangler deploy"
