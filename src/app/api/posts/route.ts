@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { revalidateTag } from 'next/cache'
 import type { FaqItem } from '@/types/database'
+import { isAdminAuthenticated } from '@/lib/admin-auth'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -18,21 +19,10 @@ function createAdminClient() {
   return createClient(supabaseUrl, supabaseServiceKey)
 }
 
-// Simple admin key check (you can replace with proper auth later)
-function isAuthorized(request: NextRequest): boolean {
-  const adminKey = request.headers.get('x-admin-key')
-  const expectedKey = process.env.ADMIN_SECRET_KEY
-
-  // If no ADMIN_SECRET_KEY is set, allow access (for development)
-  if (!expectedKey) return true
-
-  return adminKey === expectedKey
-}
-
 // GET - List all posts (including unpublished)
 export async function GET(request: NextRequest) {
   try {
-    if (!isAuthorized(request)) {
+    if (!(await isAdminAuthenticated())) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -48,17 +38,31 @@ export async function GET(request: NextRequest) {
       }, { status: 500 })
     }
 
-    const { data, error } = await supabase
+    const page = Math.max(1, Number(request.nextUrl.searchParams.get('page')) || 1)
+    const requestedPageSize = Number(request.nextUrl.searchParams.get('pageSize')) || 50
+    const pageSize = Math.min(100, Math.max(1, requestedPageSize))
+    const from = (page - 1) * pageSize
+    const to = from + pageSize - 1
+
+    const { data, error, count } = await supabase
       .from('posts')
-      .select('*')
+      .select('id, slug, title, category, is_published, published_at, created_at, updated_at', { count: 'exact' })
       .order('created_at', { ascending: false })
+      .range(from, to)
 
     if (error) {
       console.error('Supabase error:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    return NextResponse.json({ posts: data || [] })
+    const totalCount = count || 0
+    return NextResponse.json({
+      posts: data || [],
+      page,
+      pageSize,
+      totalCount,
+      totalPages: Math.max(1, Math.ceil(totalCount / pageSize)),
+    })
   } catch (err) {
     console.error('API error:', err)
     const message = err instanceof Error ? err.message : 'Server error'
@@ -69,7 +73,7 @@ export async function GET(request: NextRequest) {
 // POST - Create a new post
 export async function POST(request: NextRequest) {
   try {
-    if (!isAuthorized(request)) {
+    if (!(await isAdminAuthenticated())) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -153,7 +157,7 @@ export async function POST(request: NextRequest) {
 // PUT - Update an existing post
 export async function PUT(request: NextRequest) {
   try {
-    if (!isAuthorized(request)) {
+    if (!(await isAdminAuthenticated())) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -233,7 +237,7 @@ export async function PUT(request: NextRequest) {
 // DELETE - Delete a post
 export async function DELETE(request: NextRequest) {
   try {
-    if (!isAuthorized(request)) {
+    if (!(await isAdminAuthenticated())) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { cookies } from 'next/headers'
+import { isAdminAuthenticated } from '@/lib/admin-auth'
 
 // Create Supabase client with service role key for storage operations
 function createServiceClient() {
@@ -14,16 +14,9 @@ function createServiceClient() {
   return createClient(supabaseUrl, supabaseServiceKey)
 }
 
-// Check authentication
-async function isAuthenticated(): Promise<boolean> {
-  const cookieStore = await cookies()
-  const sessionCookie = cookieStore.get('admin_session')
-  return !!sessionCookie?.value
-}
-
 export async function POST(request: NextRequest) {
   // Check authentication
-  if (!(await isAuthenticated())) {
+  if (!(await isAdminAuthenticated())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

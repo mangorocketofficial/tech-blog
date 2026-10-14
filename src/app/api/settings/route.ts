@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { isAdminAuthenticated } from '@/lib/admin-auth'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -29,6 +30,10 @@ function createAdminClient() {
 // GET - Get settings
 export async function GET() {
   try {
+    if (!(await isAdminAuthenticated())) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const supabase = createAdminClient()
 
     if (!supabase) {
@@ -72,6 +77,10 @@ export async function GET() {
 // PUT - Update settings
 export async function PUT(request: NextRequest) {
   try {
+    if (!(await isAdminAuthenticated())) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const supabase = createAdminClient()
 
     if (!supabase) {

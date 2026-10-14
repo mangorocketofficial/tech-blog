@@ -35,6 +35,11 @@ interface Post {
   updated_at: string
 }
 
+type PostSummary = Pick<
+  Post,
+  'id' | 'slug' | 'title' | 'category' | 'is_published' | 'published_at' | 'created_at' | 'updated_at'
+>
+
 type PostFormData = {
   title: string
   slug: string
@@ -87,7 +92,10 @@ export default function AdminPage() {
   const [loginError, setLoginError] = useState<string | null>(null)
   const [loginLoading, setLoginLoading] = useState(false)
 
-  const [posts, setPosts] = useState<Post[]>([])
+  const [posts, setPosts] = useState<PostSummary[]>([])
+  const [postsPage, setPostsPage] = useState(1)
+  const [postsTotalPages, setPostsTotalPages] = useState(1)
+  const [postsTotalCount, setPostsTotalCount] = useState(0)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -190,10 +198,10 @@ export default function AdminPage() {
     }
   }
 
-  async function loadPosts() {
+  async function loadPosts(page = 1) {
     try {
       setLoading(true)
-      const res = await fetch('/api/posts')
+      const res = await fetch(`/api/posts?page=${page}&pageSize=50`)
 
       // Check if response is ok before parsing JSON
       const text = await res.text()
@@ -213,6 +221,9 @@ export default function AdminPage() {
       }
 
       setPosts(data.posts || [])
+      setPostsPage(data.page || 1)
+      setPostsTotalPages(data.totalPages || 1)
+      setPostsTotalCount(data.totalCount || 0)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load posts')
     } finally {
@@ -382,23 +393,33 @@ export default function AdminPage() {
     setSuccess(null)
   }
 
-  function startEditPost(post: Post) {
-    setEditingPost(post)
+  async function startEditPost(post: PostSummary) {
+    setError(null)
+
+    const res = await fetch(`/api/posts/${post.id}`)
+    const data = await res.json()
+    if (!res.ok || !data.post) {
+      setError(data.error || '포스트 상세 정보를 불러오지 못했습니다.')
+      return
+    }
+
+    const fullPost = data.post as Post
+    setEditingPost(fullPost)
     setFormData({
-      title: post.title,
-      slug: post.slug,
-      description: post.description || '',
-      content: post.content,
-      featured_image: post.featured_image || '',
-      coupang_url: post.coupang_url || '',
-      coupang_product_id: post.coupang_product_id || '',
-      product_name: post.product_name || '',
-      product_price: post.product_price?.toString() || '',
-      category: post.category,
-      tags: post.tags?.join(', ') || '',
-      seo_keywords: post.seo_keywords?.join(', ') || '',
-      faq: post.faq || [],
-      is_published: post.is_published,
+      title: fullPost.title,
+      slug: fullPost.slug,
+      description: fullPost.description || '',
+      content: fullPost.content,
+      featured_image: fullPost.featured_image || '',
+      coupang_url: fullPost.coupang_url || '',
+      coupang_product_id: fullPost.coupang_product_id || '',
+      product_name: fullPost.product_name || '',
+      product_price: fullPost.product_price?.toString() || '',
+      category: fullPost.category,
+      tags: fullPost.tags?.join(', ') || '',
+      seo_keywords: fullPost.seo_keywords?.join(', ') || '',
+      faq: fullPost.faq || [],
+      is_published: fullPost.is_published,
     })
     setShowForm(true)
     setError(null)
@@ -472,7 +493,7 @@ export default function AdminPage() {
     }
   }
 
-  async function handleDelete(post: Post) {
+  async function handleDelete(post: PostSummary) {
     if (!confirm(`"${post.title}" 포스트를 삭제하시겠습니까?`)) {
       return
     }
@@ -489,7 +510,7 @@ export default function AdminPage() {
       }
 
       setSuccess('포스트가 삭제되었습니다!')
-      await loadPosts()
+      await loadPosts(postsPage)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete post')
     }
@@ -1375,7 +1396,7 @@ export default function AdminPage() {
         <div className="bg-white rounded-lg shadow-md">
           <div className="p-6 border-b">
             <h2 className="text-xl font-bold text-gray-900">
-              포스트 목록 ({posts.length}개)
+              포스트 목록 (전체 {postsTotalCount}개)
             </h2>
           </div>
 
@@ -1444,6 +1465,29 @@ export default function AdminPage() {
                   </div>
                 </div>
               ))}
+              {postsTotalPages > 1 && (
+                <div className="flex items-center justify-between p-4">
+                  <button
+                    type="button"
+                    disabled={postsPage <= 1}
+                    onClick={() => loadPosts(postsPage - 1)}
+                    className="px-3 py-1 text-sm border rounded disabled:opacity-40"
+                  >
+                    이전
+                  </button>
+                  <span className="text-sm text-gray-500">
+                    {postsPage} / {postsTotalPages} 페이지
+                  </span>
+                  <button
+                    type="button"
+                    disabled={postsPage >= postsTotalPages}
+                    onClick={() => loadPosts(postsPage + 1)}
+                    className="px-3 py-1 text-sm border rounded disabled:opacity-40"
+                  >
+                    다음
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>

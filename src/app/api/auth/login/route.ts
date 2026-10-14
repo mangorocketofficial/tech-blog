@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
+import {
+  ADMIN_SESSION_COOKIE,
+  ADMIN_SESSION_MAX_AGE,
+  createAdminSessionToken,
+} from '@/lib/admin-auth'
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,15 +21,20 @@ export async function POST(request: NextRequest) {
     }
 
     if (email === adminEmail && password === adminPassword) {
-      // Create a simple session token
-      const sessionToken = Buffer.from(`${email}:${Date.now()}`).toString('base64')
+      const sessionToken = createAdminSessionToken(email)
+      if (!sessionToken) {
+        return NextResponse.json(
+          { error: 'Admin session secret is not configured' },
+          { status: 500 }
+        )
+      }
 
       const cookieStore = await cookies()
-      cookieStore.set('admin_session', sessionToken, {
+      cookieStore.set(ADMIN_SESSION_COOKIE, sessionToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
-        maxAge: 60 * 60 * 24, // 24 hours
+        maxAge: ADMIN_SESSION_MAX_AGE,
         path: '/',
       })
 

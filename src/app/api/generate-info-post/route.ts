@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import OpenAI from 'openai'
 import { revalidateTag } from 'next/cache'
+import { isAdminAuthenticated } from '@/lib/admin-auth'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -49,15 +50,6 @@ function createAdminClient() {
   return createClient(supabaseUrl, supabaseServiceKey)
 }
 
-// Simple admin key check
-function isAuthorized(request: NextRequest): boolean {
-  const adminKey = request.headers.get('x-admin-key')
-  const expectedKey = process.env.ADMIN_SECRET_KEY
-
-  if (!expectedKey) return true
-  return adminKey === expectedKey
-}
-
 // Generate next tennis slug number from database
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function getNextSlugNumber(supabase: any): Promise<number> {
@@ -79,7 +71,7 @@ async function getNextSlugNumber(supabase: any): Promise<number> {
 
 export async function POST(request: NextRequest) {
   try {
-    if (!isAuthorized(request)) {
+    if (!(await isAdminAuthenticated())) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 

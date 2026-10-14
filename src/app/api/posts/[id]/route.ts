@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { revalidateTag } from 'next/cache'
+import { isAdminAuthenticated } from '@/lib/admin-auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -16,21 +17,16 @@ function createAdminClient() {
   return createClient(supabaseUrl, supabaseServiceKey)
 }
 
-// Simple admin key check
-function isAuthorized(request: NextRequest): boolean {
-  const adminKey = request.headers.get('x-admin-key')
-  const expectedKey = process.env.ADMIN_SECRET_KEY
-
-  if (!expectedKey) return true
-  return adminKey === expectedKey
-}
-
 // GET /api/posts/[id] - Get a single post
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    if (!(await isAdminAuthenticated())) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const { id } = await params
 
     const supabase = createAdminClient()
@@ -48,7 +44,6 @@ export async function GET(
       return NextResponse.json({ error: error.message }, { status: 404 })
     }
 
-    revalidateTag('posts', 'max')
     return NextResponse.json({ post: data })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Server error'
@@ -62,7 +57,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    if (!isAuthorized(request)) {
+    if (!(await isAdminAuthenticated())) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -115,6 +110,7 @@ export async function PATCH(
     }
 
     console.log(`Post updated: ${id}, fields: ${Object.keys(updateData).join(', ')}`)
+    revalidateTag('posts', 'max')
 
     return NextResponse.json({
       post: data,
