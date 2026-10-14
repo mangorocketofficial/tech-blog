@@ -3,8 +3,6 @@ import BlogHomePage from '@/components/BlogHomePage'
 import { getPaginatedPosts } from '@/lib/supabase-server'
 import type { Metadata } from 'next'
 
-export const revalidate = 21600
-
 interface PaginatedHomePageProps {
   params: Promise<{ page: string }>
 }

@@ -3,10 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "content:sync": "node scripts/sync-content.mjs",
+    "dev": "npm run content:sync && next dev",
+    "build": "npm run content:sync && next build && node scripts/prune-static-output.mjs",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "deploy:cloudflare": "npm run build && wrangler pages deploy out --project-name tech-blog"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.90.1",
@@ -30,7 +32,8 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "^4.151.0"
   },
   "description": "최신 테크 트렌드와 리뷰"
 }

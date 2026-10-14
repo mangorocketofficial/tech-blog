@@ -2,6 +2,13 @@
 
 import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
+import StaticLink from '@/components/StaticLink'
+import {
+  adminApiFetch,
+  clearAdminToken,
+  getAdminToken,
+  setAdminToken,
+} from '@/lib/admin-api-client'
 
 // Dynamically import RichTextEditor to avoid SSR issues
 const RichTextEditor = dynamic(() => import('@/components/RichTextEditor'), {
@@ -106,6 +113,7 @@ export default function AdminPage() {
   const [infoTopic, setInfoTopic] = useState('')
   const [generatingInfo, setGeneratingInfo] = useState(false)
   const [thumbnailUploading, setThumbnailUploading] = useState(false)
+  const [deploying, setDeploying] = useState(false)
 
   // Settings state
   const [showSettingsModal, setShowSettingsModal] = useState(false)
@@ -149,8 +157,13 @@ export default function AdminPage() {
   }, [isAuthenticated])
 
   async function checkAuth() {
+    if (!getAdminToken()) {
+      setIsAuthenticated(false)
+      setAuthLoading(false)
+      return
+    }
     try {
-      const res = await fetch('/api/auth/check')
+      const res = await adminApiFetch('/auth/check')
       const data = await res.json()
       setIsAuthenticated(data.authenticated)
     } catch {
@@ -166,11 +179,11 @@ export default function AdminPage() {
     setLoginLoading(true)
 
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await adminApiFetch('/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: loginEmail, password: loginPassword }),
-      })
+      }, false)
 
       const data = await res.json()
 
@@ -178,6 +191,7 @@ export default function AdminPage() {
         throw new Error(data.error || '로그인에 실패했습니다.')
       }
 
+      setAdminToken(data.token)
       setIsAuthenticated(true)
       setLoginEmail('')
       setLoginPassword('')
@@ -190,7 +204,7 @@ export default function AdminPage() {
 
   async function handleLogout() {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' })
+      clearAdminToken()
       setIsAuthenticated(false)
       setPosts([])
     } catch {
@@ -201,7 +215,7 @@ export default function AdminPage() {
   async function loadPosts(page = 1) {
     try {
       setLoading(true)
-      const res = await fetch(`/api/posts?page=${page}&pageSize=50`)
+      const res = await adminApiFetch(`/posts?page=${page}&pageSize=50`)
 
       // Check if response is ok before parsing JSON
       const text = await res.text()
@@ -234,7 +248,7 @@ export default function AdminPage() {
   async function loadSettings() {
     try {
       setSettingsLoading(true)
-      const res = await fetch('/api/settings')
+      const res = await adminApiFetch('/settings')
       const data = await res.json()
 
       if (res.ok && data.settings) {
@@ -253,7 +267,7 @@ export default function AdminPage() {
     setError(null)
 
     try {
-      const res = await fetch('/api/settings', {
+      const res = await adminApiFetch('/settings', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ categories }),
@@ -396,7 +410,7 @@ export default function AdminPage() {
   async function startEditPost(post: PostSummary) {
     setError(null)
 
-    const res = await fetch(`/api/posts/${post.id}`)
+    const res = await adminApiFetch(`/posts/${post.id}`)
     const data = await res.json()
     if (!res.ok || !data.post) {
       setError(data.error || '포스트 상세 정보를 불러오지 못했습니다.')
@@ -469,7 +483,7 @@ export default function AdminPage() {
         is_published: formData.is_published,
       }
 
-      const res = await fetch('/api/posts', {
+      const res = await adminApiFetch('/posts', {
         method: editingPost ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(postBody),
@@ -499,7 +513,7 @@ export default function AdminPage() {
     }
 
     try {
-      const res = await fetch(`/api/posts?id=${post.id}`, {
+      const res = await adminApiFetch(`/posts?id=${post.id}`, {
         method: 'DELETE',
       })
 
@@ -527,7 +541,7 @@ export default function AdminPage() {
     setGeneratingInfo(true)
 
     try {
-      const res = await fetch('/api/generate-info-post', {
+      const res = await adminApiFetch('/generate-info-post', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ topic: infoTopic }),
@@ -550,12 +564,29 @@ export default function AdminPage() {
     }
   }
 
+  async function handleDeploy() {
+    setDeploying(true)
+    setError(null)
+    setSuccess(null)
+
+    try {
+      const res = await adminApiFetch('/deploy', { method: 'POST' })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || '정적 사이트 배포를 시작하지 못했습니다.')
+      setSuccess('정적 사이트 배포를 시작했습니다. 완료까지 몇 분 정도 걸릴 수 있습니다.')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '정적 사이트 배포를 시작하지 못했습니다.')
+    } finally {
+      setDeploying(false)
+    }
+  }
+
   // Image upload function for editor
   async function uploadImage(file: File): Promise<string> {
     const formData = new FormData()
     formData.append('file', file)
 
-    const res = await fetch('/api/upload', {
+    const res = await adminApiFetch('/upload', {
       method: 'POST',
       body: formData,
     })
@@ -688,9 +719,9 @@ export default function AdminPage() {
           </form>
 
           <div className="mt-6 text-center">
-            <a href="/" className="text-sm text-gray-500 hover:text-green-600">
+            <StaticLink href="/" className="text-sm text-gray-500 hover:text-green-600">
               ← 블로그로 돌아가기
-            </a>
+            </StaticLink>
           </div>
         </div>
       </main>
@@ -708,12 +739,12 @@ export default function AdminPage() {
               <p className="text-gray-600 mt-1">포스트 작성 및 관리</p>
             </div>
             <div className="flex gap-4">
-              <a
+              <StaticLink
                 href="/"
                 className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 블로그로 돌아가기
-              </a>
+              </StaticLink>
               {!showForm ? (
                 <button
                   type="button"
@@ -723,6 +754,14 @@ export default function AdminPage() {
                   정보 포스트 생성
                 </button>
               ) : null}
+              <button
+                type="button"
+                onClick={handleDeploy}
+                disabled={deploying}
+                className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors disabled:opacity-50"
+              >
+                {deploying ? '배포 시작 중...' : '작성한 글 배포'}
+              </button>
               {!showForm ? (
                 <button
                   type="button"

@@ -2,6 +2,8 @@ import { MetadataRoute } from 'next'
 import { getAllPostSlugs, getCategories } from '@/lib/supabase-server'
 import { SITE_URL } from '@/lib/site'
 
+export const dynamic = 'force-static'
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = SITE_URL
 

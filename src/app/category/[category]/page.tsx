@@ -1,11 +1,9 @@
 import { Metadata } from 'next'
-import Link from 'next/link'
+import Link from '@/components/StaticLink'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { getPostsByCategory, getCategories } from '@/lib/supabase-server'
 import { SITE_URL } from '@/lib/site'
-
-export const revalidate = 21600
 
 interface PageProps {
   params: Promise<{ category: string }>

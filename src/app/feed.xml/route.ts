@@ -1,6 +1,8 @@
 import { getPublishedPosts } from '@/lib/supabase-server'
 import { SITE_URL } from '@/lib/site'
 
+export const dynamic = 'force-static'
+
 export async function GET() {
   const siteUrl = SITE_URL
   const posts = await getPublishedPosts(50) // Get latest 50 posts

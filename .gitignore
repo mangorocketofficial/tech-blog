@@ -18,6 +18,8 @@
 # next.js
 /.next/
 /out/
+/.content-cache/
+/public/search-index.json
 
 # production
 /build
@@ -37,6 +39,7 @@ yarn-error.log*
 
 # vercel
 .vercel
+/supabase/.temp/
 
 # typescript
 *.tsbuildinfo

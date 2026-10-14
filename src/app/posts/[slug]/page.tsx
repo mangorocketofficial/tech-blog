@@ -1,12 +1,10 @@
 import { Metadata } from 'next'
-import Link from 'next/link'
+import Link from '@/components/StaticLink'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { getPostBySlug, getAllPostSlugs, getRelatedPosts } from '@/lib/supabase-server'
 import type { FaqItem } from '@/types/database'
 import { SITE_URL } from '@/lib/site'
-
-export const revalidate = 21600 // Revalidate every 6 hours
 
 interface PageProps {
   params: Promise<{ slug: string }>
